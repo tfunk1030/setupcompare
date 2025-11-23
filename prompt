@@ -1,0 +1,55 @@
+You are a senior full-stack developer tasked with creating a comprehensive sim-racing setup comparison web application. Build "SetupComparer" - a tool for iRacing users to analyze and compare car setup files.
+
+**CORE REQUIREMENTS:**
+
+**Backend Architecture:**
+- Node.js + Express + TypeScript
+- SQLite database with proper schema design
+- RESTful API with endpoints for: file upload, parsing, comparison, user management, history
+- File parsing engine for iRacing setup files (.sto format)
+- User authentication and session management
+
+**Frontend Architecture:**
+- React + TypeScript with modern hooks
+- Responsive design (desktop/tablet optimized)
+- Component structure: Dashboard, FileUpload, ComparisonView, HistoryPanel, ExportTools
+- State management for comparison data and user sessions
+
+**Key Features to Implement:**
+1. **File Processing**: Parse iRacing .sto files extracting all parameters (suspension, aero, ride height, tire pressures, camber, toe, anti-roll bars, differential, brake balance, fuel, etc.)
+
+2. **Comparison Engine**: Side-by-side parameter comparison showing old value → new value → delta with color-coded significance levels
+
+3. **Interpretation System**: Create 20+ rules mapping parameter changes to track behavior predictions (e.g., "Front ride height +3mm → reduced front downforce → potential understeer on turn-in")
+
+4. **User System**: Registration, login, comparison history storage, shareable public links
+
+5. **Export Functionality**: PDF/CSV export with parameter differences and interpretation commentary
+
+**Technical Specifications:**
+- Database schema for users, comparisons, setup_parameters, interpretations
+- API rate limiting and file size validation
+- Error handling for malformed setup files
+- Modular architecture supporting future features (telemetry analysis, car/track-specific rules)
+
+**Deliverables:**
+1. Complete project structure with organized folders
+2. Backend API with all endpoints implemented
+3. Frontend components with file upload, comparison display, and results visualization
+4. Setup file parser with comprehensive parameter extraction
+5. Interpretation engine with detailed rule mappings
+6. Database migrations and seed data
+7. Deployment configuration (Docker, environment variables, build scripts)
+8. Documentation for setup, deployment, and API usage
+
+**File Structure Requirements:**
+```
+/src
+  /backend (API, database, parsing logic)
+  /frontend (React components, pages, utilities)
+  /shared (TypeScript interfaces, constants)
+/docs (API documentation, deployment guide)
+/scripts (build, deployment, database setup)
+```
+
+Implement a production-ready application with proper error handling, input validation, and scalable architecture. Include comprehensive comments explaining the setup parameter interpretation logic and provide clear setup instructions for both development and production deployment.

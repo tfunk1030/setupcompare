@@ -4,7 +4,7 @@ import { db } from '../db';
 import { authenticate, AuthenticatedRequest } from '../utils/auth';
 import { parseTelemetryBuffer } from '../services/telemetryParser';
 import { applyInterpretations } from '../../shared/interpretationEngine';
-import { TelemetrySummary } from '../../shared/types';
+import { SetupAnalysisResponse, TelemetrySummary } from '../../shared/types';
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -26,30 +26,32 @@ router.post('/upload', authenticate, upload.single('file'), (req: AuthenticatedR
     summary.createdAt,
   );
 
-  const params = db.prepare('SELECT * FROM parameters WHERE comparison_id = ?').all(comparisonId) as any[];
-  const deltas = applyInterpretations(
-    params.map((row) => ({
-      key: row.key,
-      label: row.label,
-      category: row.category,
-      previousValue: coerce(row.previous_value),
-      newValue: coerce(row.new_value),
-      delta: coerce(row.delta),
-      significance: row.significance,
-      insight: row.insight,
-      unit: row.unit || undefined,
-    })) as any,
-    summary,
-    {
-      carModel: comparison.car_model,
-      trackCategory: comparison.track_category,
-      trackName: comparison.track_name,
-    },
-  );
-  const update = db.prepare(
-    'UPDATE parameters SET interpretation_short = ?, interpretation_full = ? WHERE comparison_id = ? AND key = ?',
-  );
-  deltas.forEach((delta) => update.run(delta.interpretation?.short || null, delta.interpretation?.full || null, comparisonId, delta.key));
+  const parsed: SetupAnalysisResponse | undefined = comparison.delta_json ? JSON.parse(comparison.delta_json) : undefined;
+  const deltas = parsed
+    ? applyInterpretations(parsed.deltas, summary, {
+        carModel: comparison.car_model,
+        trackCategory: comparison.track_category,
+        trackName: comparison.track_name,
+      })
+    : applyInterpretations(
+        (db.prepare('SELECT * FROM parameters WHERE comparison_id = ?').all(comparisonId) as any[]).map((row) => ({
+          key: row.key,
+          label: row.label,
+          category: row.category,
+          previousValue: coerce(row.previous_value),
+          newValue: coerce(row.new_value),
+          delta: coerce(row.delta),
+          significance: row.significance,
+          insight: row.insight,
+          unit: row.unit || undefined,
+        })) as any,
+        summary,
+        {
+          carModel: comparison.car_model,
+          trackCategory: comparison.track_category,
+          trackName: comparison.track_name,
+        },
+      );
   return res.json({ telemetry: summary, deltas });
 });
 

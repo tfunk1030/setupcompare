@@ -1,23 +1,38 @@
-Create a full-stack web application named SetupComparer for sim-racing users of iRacing. The core functionality is:
+# SetupComparer
 
-Allow the user to upload two car-setup files exported from iRacing.
+SetupComparer is a full-stack web application for iRacing drivers to upload two setup files, compare them side-by-side, and receive human-friendly insights on how changes will affect on-track behaviour.
 
-Automatically parse each setup file to extract all setup parameters (suspension, aero, ride height, tyre pressures, camber, toe, anti-roll bars, etc).
+## Features
+- Upload two iRacing `.sto` setup files and automatically parse sections such as suspension, aero, ride height, tyres, alignment, differential, brakes, fuel, and drivetrain.
+- Comparison engine shows old value → new value → delta with colour-coded significance.
+- Interpretation engine with 20+ rules to describe likely handling changes, plus profile-aware hints for car model and track category.
+- User accounts with JWT authentication, comparison history, and shareable public links (login required to upload setups or save comparisons).
+- Export comparison results to CSV or PDF with commentary.
+- Optional telemetry upload (.ibt or CSV) to overlay tyre temps, lap times, and wheel speeds alongside setup deltas.
+- Modern stack: React + TypeScript frontend, Express + TypeScript backend, SQLite persistence.
 
-Present a side-by-side comparison of the two setups: display each parameter’s old value, new value, and delta; highlight major changes visually (e.g., colour coding).
+## Project structure
+```
+/src
+  /backend   # API, parsing, comparison logic
+  /frontend  # React app
+  /shared    # TypeScript contracts
+/docs        # API and deployment guides
+/scripts     # automation hooks
+```
 
-Include a human-friendly interpretation engine: for each significant parameter change produce a text explanation of what that change will likely do on track (e.g., “increasing front ride height by 3 mm → less front downforce → likely under-steer on turn-in”).
+## Getting started
+1. Install dependencies: `npm install`
+2. Run backend: `npm run dev:backend`
+3. Run frontend dev server: `npm run dev:frontend`
 
-Provide user accounts so each user can save past comparisons, view comparison history, export reports, and optionally generate a shareable public link.
+Environment variables:
+- `PORT` (default 4000)
+- `DB_PATH` location for SQLite file
+- `JWT_SECRET` token signing secret
 
-Use a modern tech stack: React + TypeScript for the front end, Node.js + Express + SQLite (or other lightweight DB) for the backend, REST API endpoints, responsive UI (desktop + tablet).
+## API
+See [docs/API.md](docs/API.md) for endpoint details.
 
-In the UI, after file upload and parsing, show: a dashboard with past comparisons, a new-comparison flow, the detailed comparison view, and the interpretation panel.
-
-Provide export functionality (PDF or CSV) of comparison results with parameter differences and human insight commentary.
-
-Architect the app so it can later support advanced features: telemetry upload (e.g., .ibt files), car/track-specific rule variations, and deeper analytics.
-
-Include deployment configuration: environment variables, build scripts, and instructions to deploy on a cloud platform or self-host.
-
-Please scaffold project structure (folders, key files), implement parsing of setup files, build the comparison engine, create the UI for file uploads and results display, and stub out the interpretation engine with at least 20 mapping rules for common setup parameters.”
+## Deployment
+Container-friendly configuration with build scripts described in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Persist the SQLite volume when deploying.

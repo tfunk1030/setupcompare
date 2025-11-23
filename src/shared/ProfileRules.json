@@ -1,0 +1,88 @@
+{
+  "profiles": [
+    {
+      "carModel": "GT3",
+      "trackCategory": "road",
+      "overrides": [
+        {
+          "keyIncludes": ["aero.rear.wing"],
+          "shortHint": "GT3 road: rear wing shifts diffuser balance; extra clicks may be needed for long sweepers.",
+          "fullHint": "On BoP-limited GT3 aero, rear wing adds stability through fast esses but watch straight-line drag on long road courses."
+        },
+        {
+          "keyIncludes": ["ride_height.rear"],
+          "shortHint": "GT3 road: rake strongly influences diffuser stall; small changes matter.",
+          "fullHint": "Higher rear ride height increases rake and can wake up the diffuser but risks rear instability over curbs on road layouts."
+        },
+        {
+          "keyIncludes": ["tyre", "pressure"],
+          "shortHint": "GT3 road: target hot pressures tightly; adjust to keep within 0.1 bar window.",
+          "fullHint": "GT3 slicks reward precise pressures—use telemetry to keep hot pressures in the sweet spot for stint-length grip."
+        }
+      ]
+    },
+    {
+      "carModel": "Prototype",
+      "trackCategory": "road",
+      "overrides": [
+        {
+          "keyIncludes": ["aero.front.wing"],
+          "shortHint": "Prototype road: front aero changes alter brake balance feel; expect stronger platform effects.",
+          "fullHint": "High-downforce prototypes react sharply to front wing moves; combine with damper tweaks to preserve platform in fast corners."
+        },
+        {
+          "keyIncludes": ["suspension.arb.front"],
+          "shortHint": "Stiffer bars tie into hybrid recovery; mind kerb compliance on road courses.",
+          "fullHint": "Prototype anti-roll changes affect aero platform and hybrid stability—keep kerb compliance for chicanes."
+        }
+      ]
+    },
+    {
+      "carModel": "Oval",
+      "trackCategory": "short-oval",
+      "overrides": [
+        {
+          "keyIncludes": ["alignment.front", "camber"],
+          "shortHint": "Short-oval: camber split controls tire temp; bias for sustained LF heat.",
+          "fullHint": "On short ovals, more RF negative camber helps mid-corner bite but watch LF temps late in a run."
+        },
+        {
+          "keyIncludes": ["alignment.rear", "toe"],
+          "shortHint": "Rear toe-steer sets entry attitude; too much can hurt straight speed.",
+          "fullHint": "Toe-out on the RR can free entry on tight ovals but adds scrub on the straights—balance with ride heights."
+        },
+        {
+          "keyIncludes": ["ride_height.front"],
+          "shortHint": "Keep front valence off the track; splitter strikes hurt short-oval rhythm.",
+          "fullHint": "Slightly higher front ride height prevents bottoming over bumps and maintains consistent aero seal."
+        }
+      ]
+    },
+    {
+      "carModel": "Oval",
+      "trackCategory": "superspeedway",
+      "overrides": [
+        {
+          "keyIncludes": ["aero.rear.wing"],
+          "shortHint": "Superspeedway: wing trim is about drag; stability comes from platform.",
+          "fullHint": "On superspeedways, small rear wing reductions cut drag but must be paired with stable rake to avoid pack aero push."
+        },
+        {
+          "keyIncludes": ["ride_height"],
+          "shortHint": "Lower platform reduces drag; be wary of porpoising in the draft.",
+          "fullHint": "Running the car lower down the straight reduces drag but may oscillate in wake—monitor telemetry for bottoming."
+        }
+      ]
+    },
+    {
+      "trackCategory": "road",
+      "overrides": [
+        {
+          "keyIncludes": ["brakes.bias"],
+          "shortHint": "Road circuits need stable braking; bias tweaks change trail-brake feel.",
+          "fullHint": "Shift bias forward for downhill braking zones; rearward bias helps rotation but risks lockups into hairpins."
+        }
+      ]
+    }
+  ]
+}

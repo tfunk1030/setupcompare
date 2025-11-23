@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import { ParameterDelta } from '../../shared/types';
+import { ParameterDelta, SetupAnalysisSummary } from '../../shared/types';
 
 interface Props {
   deltas: ParameterDelta[];
   activeKey?: string | null;
   onSelect?: (key: string | null) => void;
+  summary?: SetupAnalysisSummary;
 }
 
-const InterpretationPanel: React.FC<Props> = ({ deltas, activeKey, onSelect }) => {
+const InterpretationPanel: React.FC<Props> = ({ deltas, activeKey, onSelect, summary }) => {
   const [mode, setMode] = useState<'short' | 'full'>('short');
   const highlights = useMemo(() => deltas.filter((d) => d.interpretation), [deltas]);
 
@@ -24,6 +25,22 @@ const InterpretationPanel: React.FC<Props> = ({ deltas, activeKey, onSelect }) =
           </button>
         </div>
       </div>
+      {summary && (
+        <div className="summary-block">
+          <p className="muted">{mode === 'short' ? summary.combinedShort : summary.combinedFull}</p>
+          <ul>
+            <li>
+              <strong>Overall:</strong> {summary.overallEffect}
+            </li>
+            <li>
+              <strong>Balance:</strong> {summary.balance}
+            </li>
+            <li>
+              <strong>Recommendations:</strong> {summary.recommendations.join('; ')}
+            </li>
+          </ul>
+        </div>
+      )}
       {highlights.length === 0 && <p className="muted">No significant changes detected.</p>}
       <ul className="interpretation-list">
         {highlights.map((delta) => (

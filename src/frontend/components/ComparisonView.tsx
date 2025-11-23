@@ -48,7 +48,19 @@ const ComparisonView: React.FC<Props> = ({ deltas, activeKey, onFocus, onSelect 
                 {typeof delta.delta === 'number' ? delta.delta.toFixed(3) : delta.delta}
                 {delta.unit ? ` ${delta.unit}` : ''}
               </td>
-              <td>{delta.interpretation?.short || delta.insight || '—'}</td>
+              <td>
+                <div className="insight">
+                  <div className="insight__summary">{delta.interpretation?.short || delta.insight || '—'}</div>
+                  {delta.interpretation?.full && delta.key === activeKey && (
+                    <div className="insight__details">{delta.interpretation.full}</div>
+                  )}
+                  {delta.interpretation?.full && (
+                    <button className="link" onClick={() => onSelect?.(delta.key)}>
+                      {delta.key === activeKey ? 'Hide details' : 'Show details'}
+                    </button>
+                  )}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

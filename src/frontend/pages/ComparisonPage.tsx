@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import ComparisonView from '../components/ComparisonView';
 import InterpretationPanel from '../components/InterpretationPanel';
 import ExportTools from '../components/ExportTools';
 import TelemetryPanel from '../components/TelemetryPanel';
-import { ParameterDelta, SetupFile, TelemetrySummary } from '../../shared/types';
+import { ParameterDelta, SetupAnalysisSummary, SetupFile, TelemetrySummary } from '../../shared/types';
 
 interface Props {
   token: string | null;
 }
 
 const ComparisonPage: React.FC<Props> = ({ token }) => {
-  const location = useLocation();
   const [deltas, setDeltas] = useState<ParameterDelta[]>([]);
   const [baseline, setBaseline] = useState<SetupFile | null>(null);
   const [candidate, setCandidate] = useState<SetupFile | null>(null);
@@ -20,26 +18,32 @@ const ComparisonPage: React.FC<Props> = ({ token }) => {
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [comparisonId, setComparisonId] = useState<string | null>(null);
   const [telemetry, setTelemetry] = useState<TelemetrySummary | null>(null);
+  const [summary, setSummary] = useState<SetupAnalysisSummary | null>(null);
+  const [setupAFile, setSetupAFile] = useState<File | null>(null);
+  const [setupBFile, setSetupBFile] = useState<File | null>(null);
+  const [carModel, setCarModel] = useState('');
+  const [trackName, setTrackName] = useState('');
+  const [trackCategory, setTrackCategory] = useState('');
 
   const handleUpload = async () => {
-    const state = location.state as { files?: FileList; carModel?: string; trackCategory?: string; trackName?: string };
-    if (!state?.files || state.files.length !== 2 || !token) {
-      setStatus('Missing files or session. Please start from Dashboard.');
+    if (!setupAFile || !setupBFile || !token) {
+      setStatus('Two setup files and a session are required');
       return;
     }
     const formData = new FormData();
-    formData.append('files', state.files[0]);
-    formData.append('files', state.files[1]);
-    if (state.carModel) formData.append('carModel', state.carModel);
-    if (state.trackCategory) formData.append('trackCategory', state.trackCategory);
-    if (state.trackName) formData.append('trackName', state.trackName);
-    const response = await axios.post('/api/comparisons/upload', formData, {
+    formData.append('setupA', setupAFile);
+    formData.append('setupB', setupBFile);
+    if (carModel) formData.append('carModel', carModel);
+    if (trackCategory) formData.append('trackCategory', trackCategory);
+    if (trackName) formData.append('trackName', trackName);
+    const response = await axios.post('/api/comparisons/analyseSetupEffects', formData, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    setDeltas(response.data.deltas);
-    setBaseline(response.data.baseline);
-    setCandidate(response.data.candidate);
-    setComparisonId(response.data.id);
+    setDeltas(response.data.deltas || response.data.analysis?.deltas || response.data.summary?.deltas || []);
+    setSummary(response.data.summary || null);
+    setBaseline(response.data.baseline || null);
+    setCandidate(response.data.candidate || null);
+    setComparisonId(response.data.id || null);
     setStatus('Comparison ready');
   };
 
@@ -58,15 +62,56 @@ const ComparisonPage: React.FC<Props> = ({ token }) => {
 
   return (
     <div className="page">
-      <h2>Comparison Results</h2>
-      <button onClick={handleUpload}>Process Files</button>
-      {status && <p className="status">{status}</p>}
+      <h2>New Comparison</h2>
+      <div className="upload-card">
+        <div className="field-row">
+          <div>
+            <label>Baseline setup</label>
+            <input type="file" onChange={(e) => setSetupAFile(e.target.files?.[0] || null)} />
+          </div>
+          <div>
+            <label>Candidate setup</label>
+            <input type="file" onChange={(e) => setSetupBFile(e.target.files?.[0] || null)} />
+          </div>
+        </div>
+        <div className="field-row">
+          <input placeholder="Car model" value={carModel} onChange={(e) => setCarModel(e.target.value)} />
+          <input placeholder="Track name" value={trackName} onChange={(e) => setTrackName(e.target.value)} />
+          <input placeholder="Track category" value={trackCategory} onChange={(e) => setTrackCategory(e.target.value)} />
+        </div>
+        <button onClick={handleUpload}>Analyse setup effects</button>
+        {status && <p className="status">{status}</p>}
+      </div>
+
       {deltas.length > 0 && (
         <div className="grid">
-          <ComparisonView deltas={deltas} activeKey={activeKey} onFocus={setActiveKey} onSelect={setActiveKey} />
-          <InterpretationPanel deltas={deltas} activeKey={activeKey} onSelect={setActiveKey} />
+          <ComparisonView
+            deltas={deltas}
+            activeKey={activeKey}
+            onFocus={setActiveKey}
+            onSelect={(key) => setActiveKey((current) => (current === key ? null : key))}
+          />
+          <InterpretationPanel
+            deltas={deltas}
+            activeKey={activeKey}
+            onSelect={(key) => setActiveKey((current) => (current === key ? null : key))}
+            summary={summary || undefined}
+          />
         </div>
       )}
+
+      {summary && (
+        <div className="interpretation">
+          <h3>What This Means On Track</h3>
+          <p>{summary.combinedFull}</p>
+          <ul>
+            <li><strong>Overall:</strong> {summary.overallEffect}</li>
+            <li><strong>Balance:</strong> {summary.balance}</li>
+            <li><strong>Interactions:</strong> {summary.interactions.join(', ') || 'None'}</li>
+          </ul>
+        </div>
+      )}
+
       {comparisonId && (
         <div className="upload-card">
           <h4>Attach Telemetry (.ibt)</h4>

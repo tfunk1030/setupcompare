@@ -31,6 +31,19 @@ CREATE TABLE IF NOT EXISTS comparisons (
   track_name TEXT,
   track_category TEXT,
   status TEXT DEFAULT 'active',
+  setupA_id TEXT,
+  setupB_id TEXT,
+  delta_json TEXT,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS setups (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  car_model TEXT,
+  track TEXT,
+  parameter_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
@@ -73,5 +86,8 @@ ensureColumn('comparisons', 'car_model', 'TEXT');
 ensureColumn('comparisons', 'track_name', 'TEXT');
 ensureColumn('comparisons', 'track_category', 'TEXT');
 ensureColumn('comparisons', 'status', "TEXT DEFAULT 'active'");
+ensureColumn('comparisons', 'setupA_id', 'TEXT');
+ensureColumn('comparisons', 'setupB_id', 'TEXT');
+ensureColumn('comparisons', 'delta_json', 'TEXT');
 ensureColumn('parameters', 'interpretation_short', 'TEXT');
 ensureColumn('parameters', 'interpretation_full', 'TEXT');

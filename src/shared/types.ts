@@ -37,11 +37,22 @@ export interface ParameterDelta extends SetupParameter {
   newValue: number | string;
   delta: number | string;
   significance: 'low' | 'medium' | 'high';
+  severity?: SeverityMeta;
   insight?: string;
   interpretation?: {
     short: string;
     full: string;
   };
+  missingSide?: 'baseline' | 'candidate';
+}
+
+export type SeverityLevel = 'minor' | 'moderate' | 'major';
+
+export interface SeverityMeta {
+  level: SeverityLevel;
+  magnitude?: number;
+  threshold: number;
+  reason?: string;
 }
 
 export interface TelemetryLapSample {
@@ -76,6 +87,7 @@ export interface ComparisonRecord {
   baseline: SetupFile;
   candidate: SetupFile;
   deltas: ParameterDelta[];
+  summary?: SetupAnalysisSummary;
   notes?: string;
   shareId?: string;
   carModel?: string;
@@ -83,4 +95,29 @@ export interface ComparisonRecord {
   trackCategory?: TrackCategory | string;
   status?: 'active' | 'archived';
   telemetry?: TelemetrySummary;
+}
+
+export interface SetupRecord {
+  id: string;
+  userId: string;
+  carModel?: string;
+  track?: string;
+  parameterJson: SetupFile;
+  createdAt: string;
+}
+
+export interface SetupAnalysisSummary {
+  overallEffect: string;
+  interactions: string[];
+  balance: string;
+  recommendations: string[];
+  combinedShort: string;
+  combinedFull: string;
+}
+
+export interface SetupAnalysisResponse {
+  deltas: ParameterDelta[];
+  summary: SetupAnalysisSummary;
+  baseline: SetupFile;
+  candidate: SetupFile;
 }

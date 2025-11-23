@@ -1,23 +1,60 @@
-Create a full-stack web application named SetupComparer for sim-racing users of iRacing. The core functionality is:
+# SetupComparer
 
-Allow the user to upload two car-setup files exported from iRacing.
+SetupComparer is a full-stack web application for iRacing drivers to upload two setup files, compare them side-by-side, and receive human-friendly insights on how changes will affect on-track behaviour.
 
-Automatically parse each setup file to extract all setup parameters (suspension, aero, ride height, tyre pressures, camber, toe, anti-roll bars, etc).
+## Features
+- Upload two iRacing `.sto` setup files and automatically parse sections such as suspension, aero, ride height, tyres, alignment, differential, brakes, fuel, and drivetrain.
+- Comparison engine shows old value → new value → delta with colour-coded significance.
+- Interpretation engine with 20+ rules to describe likely handling changes, plus profile-aware hints for car model and track category.
+- Setup Effect Analysis workflow that stores each setup, links comparisons to setup IDs, and hydrates deltas/summary from the database for history and sharing.
+- User accounts with JWT authentication, comparison history, and shareable public links (login required to upload setups or save comparisons).
+- Export comparison results to CSV or PDF with commentary.
+- Optional telemetry upload (.ibt or CSV) to overlay tyre temps, lap times, and wheel speeds alongside setup deltas.
+- Modern stack: React + TypeScript frontend, Express + TypeScript backend, SQLite persistence.
 
-Present a side-by-side comparison of the two setups: display each parameter’s old value, new value, and delta; highlight major changes visually (e.g., colour coding).
+## Project structure
+```
+/src
+  /backend   # API, parsing, comparison logic
+  /frontend  # React app
+  /shared    # TypeScript contracts
+/docs        # API and deployment guides
+/scripts     # automation hooks
+```
 
-Include a human-friendly interpretation engine: for each significant parameter change produce a text explanation of what that change will likely do on track (e.g., “increasing front ride height by 3 mm → less front downforce → likely under-steer on turn-in”).
+## Getting started
+1. Install dependencies: `npm install`
+2. Run backend: `npm run dev:backend`
+3. Run frontend dev server: `npm run dev:frontend`
+4. Run unit tests (comparison/rule/summary engines): `npm test`
 
-Provide user accounts so each user can save past comparisons, view comparison history, export reports, and optionally generate a shareable public link.
+Environment variables:
+- `PORT` (default 4000)
+- `DB_PATH` location for SQLite file
+- `JWT_SECRET` token signing secret
 
-Use a modern tech stack: React + TypeScript for the front end, Node.js + Express + SQLite (or other lightweight DB) for the backend, REST API endpoints, responsive UI (desktop + tablet).
+## API
+See [docs/API.md](docs/API.md) for endpoint details.
 
-In the UI, after file upload and parsing, show: a dashboard with past comparisons, a new-comparison flow, the detailed comparison view, and the interpretation panel.
+### Setup Effect Analysis endpoint
+- `POST /api/comparisons/analyseSetupEffects` (auth required)
+  - Accepts `setupA`/`setupB` files (multipart), raw JSON payloads, or existing `setupA_id`/`setupB_id` references.
+  - Optional metadata: `carModel`, `trackName`, `trackCategory`.
+  - Returns stored comparison record with `deltas`, `summary`, `baseline`, `candidate`, and setup IDs for hydration.
 
-Provide export functionality (PDF or CSV) of comparison results with parameter differences and human insight commentary.
+### Severity thresholds
+- The comparison engine classifies minor/moderate/major severities using default thresholds defined in `src/shared/comparisonEngine.ts`.
+- Override by passing a custom threshold object when invoking the engine (or extend the route to accept overrides).
+- Each `ParameterDelta` now carries a `severity` payload plus `missingSide` metadata when a parameter exists in only one setup.
 
-Architect the app so it can later support advanced features: telemetry upload (e.g., .ibt files), car/track-specific rule variations, and deeper analytics.
+### Rule database and maintenance
+- Rule definitions with context tags live in `src/shared/rules/defaultRules.json`.
+- Each rule lists `keyIncludes`, optional `contexts` (`carModel`, `trackCategory`), and `shortTemplate`/`fullTemplate` strings.
+- To add or edit rules: update the JSON entry, ensuring keys match setup parameter identifiers; no code changes are required unless adding new context fields.
 
-Include deployment configuration: environment variables, build scripts, and instructions to deploy on a cloud platform or self-host.
+### Setup Effect Analysis UX
+- The Comparison page now provides a “New Comparison” uploader, per-parameter explanation toggles, and a combined "What This Means On Track" summary with short/full modes.
+- Combined summaries highlight overall effect, balance, interactions, and recommendations.
 
-Please scaffold project structure (folders, key files), implement parsing of setup files, build the comparison engine, create the UI for file uploads and results display, and stub out the interpretation engine with at least 20 mapping rules for common setup parameters.”
+## Deployment
+Container-friendly configuration with build scripts described in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Persist the SQLite volume when deploying.

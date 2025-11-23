@@ -1,0 +1,51 @@
+[
+  {
+    "keyIncludes": ["ride_height.front"],
+    "contexts": { "trackCategory": ["road", "short-oval", "superspeedway"] },
+    "shortTemplate": "Front ride height {direction} by {delta} => aero balance shifts {balance}",
+    "fullTemplate": "Raising front ride height reduces front downforce and loosens turn-in; lowering adds bite but risks bottoming. Change recorded: {deltaWithUnit} ({direction}).",
+    "effect": "aero-balance"
+  },
+  {
+    "keyIncludes": ["ride_height.rear"],
+    "shortTemplate": "Rear ride height {direction} by {delta} => rake change affects rotation",
+    "fullTemplate": "Rear ride height moved {direction} by {deltaWithUnit}, tilting rake and shifting aero balance toward the {direction === 'increase' ? 'front' : 'rear'} end.",
+    "effect": "aero-balance"
+  },
+  {
+    "keyIncludes": ["tyre.front", "pressure"],
+    "shortTemplate": "Front tyre pressures {direction}: feel {direction === 'increase' ? 'sharper' : 'softer'}",
+    "fullTemplate": "Front pressure change of {deltaWithUnit} {direction === 'increase' ? 'sharpens response and heats shoulders faster' : 'adds compliance and footprint but may feel vague' }.",
+    "effect": "tyre-grip"
+  },
+  {
+    "keyIncludes": ["tyre.rear", "pressure"],
+    "shortTemplate": "Rear pressures {direction}: exits {direction === 'increase' ? 'more agile' : 'more planted'}",
+    "fullTemplate": "Rear pressure adjustment of {deltaWithUnit} shifts balance on power: {direction === 'increase' ? 'quicker rotation but looser exits' : 'better traction and stability'}.",
+    "effect": "traction"
+  },
+  {
+    "keyIncludes": ["alignment.front", "toe"],
+    "shortTemplate": "Front toe {direction}: {direction === 'increase' ? 'faster turn-in' : 'calmer straights'}",
+    "fullTemplate": "Front toe change of {deltaWithUnit} {direction === 'increase' ? 'adds aggression on entry' : 'stabilises the car down straights' }.",
+    "effect": "steering"
+  },
+  {
+    "keyIncludes": ["alignment.rear", "toe"],
+    "shortTemplate": "Rear toe {direction}: exits {direction === 'increase' ? 'safer' : 'looser'}",
+    "fullTemplate": "Rear toe change of {deltaWithUnit} {direction === 'increase' ? 'locks rear for stability' : 'frees rotation off throttle'}.",
+    "effect": "rear-stability"
+  },
+  {
+    "keyIncludes": ["differential.power"],
+    "shortTemplate": "Power ramp {direction}: exit {direction === 'increase' ? 'traction' : 'rotation'}",
+    "fullTemplate": "Power ramp delta {deltaWithUnit} {direction === 'increase' ? 'improves traction but may push wide' : 'increases rotation but can spin inside wheel'}.",
+    "effect": "diff-exit"
+  },
+  {
+    "keyIncludes": ["differential.coast"],
+    "shortTemplate": "Coast ramp {direction}: entry {direction === 'increase' ? 'stable' : 'rotatable'}",
+    "fullTemplate": "Coast ramp delta {deltaWithUnit} {direction === 'increase' ? 'adds braking stability' : 'frees rotation on entry'}.",
+    "effect": "diff-entry"
+  }
+]
